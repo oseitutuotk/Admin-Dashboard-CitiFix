@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+@theme {
+  /* ---- Color: functional palette, not decorative ---- */
+  /* Neutrals */
+  --color-ink: #1c1d1f;          /* headings, primary buttons, active nav */
+  --color-body: #3f4247;         /* body text */
+  --color-muted: #6b7076;        /* secondary text, placeholders */
+  --color-subtle: #8b9096;       /* tertiary text, timestamps */
+  --color-border: #e4e3df;       /* hairline borders */
+  --color-border-strong: #d1d0cb;
+  --color-surface: #ffffff;      /* card/panel surfaces */
+  --color-page: #f7f7f5;         /* page background, warm neutral */
+  --color-page-alt: #f0efec;     /* zebra stripe / hover surface */
+
+  /* Accent — functional, matches citizen PWA blue. Used for links,
+     focus states, selected/active elements, informational emphasis.
+     Not used for decoration. */
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-accent-subtle: #eaf1fe;
+
+  /* Status colors — reserved exclusively for status/priority signaling */
+  --color-status-processing: #6b7076;   /* neutral grey */
+  --color-status-processing-bg: #f0efec;
+  --color-status-active: #2563eb;       /* accent blue */
+  --color-status-active-bg: #eaf1fe;
+  --color-status-inprogress: #a15c00;   /* amber/brown, not yellow-on-white */
+  --color-status-inprogress-bg: #fbf1de;
+  --color-status-resolved: #2f7a4f;     /* muted green */
+  --color-status-resolved-bg: #e9f5ee;
+
+  /* Priority-5 / critical — the one place a warm color appears, and only
+     ever tied to the priority-5 acknowledgment signal, never decorative */
+  --color-critical: #b3261e;
+  --color-critical-bg: #fbeceb;
+
+  /* ---- Type ---- */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* ---- Radius scale: two steps, used consistently by role ---- */
+  --radius-sm: 6px;   /* inputs, badges, small controls */
+  --radius-md: 10px;  /* cards, panels, modals */
+  --radius-pill: 999px; /* buttons, pills */
+
+  /* ---- Shadow: one soft elevation, reserved for overlays only
+     (modals, dropdowns, toasts) — never under static cards ---- */
+  --shadow-overlay: 0 8px 24px rgba(28, 29, 31, 0.12), 0 2px 6px rgba(28, 29, 31, 0.06);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    font-family: var(--font-sans);
+    color: var(--color-body);
+  }
+  body {
+    background-color: var(--color-page);
+  }
+  ::selection {
+    background-color: var(--color-accent-subtle);
+    color: var(--color-ink);
+  }
+  /* Visible keyboard focus everywhere — accessibility floor */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
