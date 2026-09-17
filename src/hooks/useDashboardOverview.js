@@ -1,30 +1,32 @@
-// src/hooks/useDashboardOverview.js — replace entirely
 import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabaseClient'
 import { TERMINAL_STATUSES } from '../components/ui/StatusBadge'
 
 const RECENT_LIMIT = 8
+const IN_AREA = 'is_in_service_area.is.null,is_in_service_area.eq.true'
 
 async function fetchDashboardOverview() {
   const [totalRes, activeRes, resolvedRes, recentRes, resolvedTimingRes] = await Promise.all([
-    supabase.from('reports').select('id', { count: 'exact', head: true }),
+    supabase.from('reports').select('id', { count: 'exact', head: true }).or(IN_AREA),
 
     supabase
       .from('reports')
       .select('id', { count: 'exact', head: true })
+      .or(IN_AREA)
       .not('status', 'in', `(${TERMINAL_STATUSES.map((s) => `"${s}"`).join(',')})`),
 
-    supabase.from('reports').select('id', { count: 'exact', head: true }).eq('status', 'Resolved'),
+    supabase.from('reports').select('id', { count: 'exact', head: true }).or(IN_AREA).eq('status', 'Resolved'),
 
     supabase
       .from('reports')
       .select(
-        'id, reference_code, title, location_name, status, priority, priority5_acknowledged_at, created_at, departments(name)'
+        'id, reference_code, title, location_name, status, priority, priority5_acknowledged_at, is_read, created_at, departments(name)'
       )
+      .or(IN_AREA)
       .order('created_at', { ascending: false })
       .limit(RECENT_LIMIT),
 
-    supabase.from('reports').select('created_at, updated_at').eq('status', 'Resolved'),
+    supabase.from('reports').select('created_at, updated_at').or(IN_AREA).eq('status', 'Resolved'),
   ])
 
   const firstError =
