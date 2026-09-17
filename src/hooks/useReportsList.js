@@ -26,7 +26,7 @@ export function useReportsList(filters) {
       let query = supabase
         .from('reports')
         .select(
-          'id, reference_code, title, location_name, status, priority, priority5_acknowledged_at, created_at, department_id, departments(name)',
+          'id, reference_code, title, location_name, status, priority, priority5_acknowledged_at, is_read, created_at, department_id, departments(name)',
           { count: 'exact' }
         )
         .order('created_at', { ascending: false })

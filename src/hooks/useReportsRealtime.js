@@ -4,6 +4,31 @@ import { useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabaseClient'
 import { useToast } from '../components/ui/Toast'
 
+function playAlertSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)()
+    const now = ctx.currentTime
+    ;[880, 660].forEach((freq, i) => {
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.type = 'sine'
+      osc.frequency.value = freq
+      const start = now + i * 0.18
+      gain.gain.setValueAtTime(0.001, start)
+      gain.gain.exponentialRampToValueAtTime(0.2, start + 0.02)
+      gain.gain.exponentialRampToValueAtTime(0.001, start + 0.3)
+      osc.start(start)
+      osc.stop(start + 0.3)
+    })
+  } catch {
+    // Audio unavailable/blocked — non-critical
+  }
+}
+
+
+
 /**
  * Single Realtime subscription to the reports table, mounted once at
  * the app shell (AdminLayout). On ANY insert/update it invalidates the
@@ -38,6 +63,7 @@ export function useReportsRealtime() {
 
           if (isNewCritical && !toastedIds.current.has(row.id)) {
             toastedIds.current.add(row.id)
+            playAlertSound()
             showToast({
               variant: 'critical',
               title: 'New priority 5 report',
