@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Bell, AlertTriangle } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { formatRelativeTime } from '../../lib/format'
 import EmptyState from '../ui/EmptyState'
 
 /**
@@ -74,7 +75,7 @@ export default function NotificationBell({ notifications = [], loading = false }
                     <div className="min-w-0">
                       <p className="text-[13px] font-medium text-[var(--color-ink)] truncate">{n.title}</p>
                       <p className="text-[12px] text-[var(--color-muted)] mt-0.5">
-                        {n.referenceCode} · {n.createdAt}
+                        {n.reference_code} · {formatRelativeTime(n.created_at)}
                       </p>
                     </div>
                   </Link>
