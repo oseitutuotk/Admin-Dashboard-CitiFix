@@ -1,31 +1,31 @@
-import { Search } from 'lucide-react'
+import { PanelLeftClose, PanelLeft } from 'lucide-react'
 import NotificationBell from './NotificationBell'
+import GlobalSearch from './GlobalSearch'
 
-export default function Topbar({ crumb, notifications = [], adminEmail = 'admin@onma.gov.gh' }) {
+export default function Topbar({ pageTitle, collapsed, onToggleSidebar, notifications = [], adminEmail = 'admin@onma.gov.gh' }) {
   return (
     <header className="h-16 shrink-0 border-b border-[var(--color-border)] bg-[var(--color-surface)] flex items-center justify-between px-6 gap-4">
-      <p className="text-[13px] text-[var(--color-muted)] truncate">{crumb}</p>
+      <div className="flex items-center gap-3">
+        <button
+          onClick={onToggleSidebar}
+          className="flex size-8 items-center justify-center rounded-[var(--radius-sm)] text-[var(--color-muted)] hover:bg-[var(--color-page-alt)] hover:text-[var(--color-ink)] transition-colors"
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          {collapsed ? <PanelLeft className="size-[18px]" /> : <PanelLeftClose className="size-[18px]" />}
+        </button>
+        <h1 className="text-[15px] font-semibold text-[var(--color-ink)]">
+          <span className="text-[var(--color-muted)] font-normal">Admin Portal / </span>
+          {pageTitle}
+        </h1>
+      </div>
 
       <div className="flex items-center gap-3 ml-auto">
-        <div className="relative hidden sm:block">
-          <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-[var(--color-subtle)]"
-            aria-hidden="true"
-          />
-          <input
-            type="search"
-            placeholder="Search reports, departments…"
-            className="w-64 rounded-full border border-[var(--color-border-strong)] bg-[var(--color-page)] pl-9 pr-3 py-1.5 text-[13px] placeholder:text-[var(--color-subtle)] focus:bg-white"
-          />
-        </div>
+        <GlobalSearch />
 
         <NotificationBell notifications={notifications} />
 
         <div className="flex items-center gap-2 pl-1">
-          <div
-            className="flex size-8 items-center justify-center rounded-full bg-[var(--color-ink)] text-white text-[12px] font-medium"
-            aria-hidden="true"
-          >
+          <div className="flex size-8 items-center justify-center rounded-full bg-[var(--color-ink)] text-white text-[12px] font-medium" aria-hidden="true">
             {adminEmail.charAt(0).toUpperCase()}
           </div>
           <div className="hidden md:block leading-tight">
