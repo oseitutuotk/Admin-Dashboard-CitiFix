@@ -1,24 +1,23 @@
-// src/components/layout/AdminLayout.jsx — replace entirely
 import { useState } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import Topbar from './Topbar'
 import CriticalAcknowledgmentModal from './CriticalAcknowledgmentModal'
 import { useCriticalAlerts } from '../../hooks/useCriticalAlerts'
-import { useAcknowledgeReport } from '../../hooks/useAcknowledgeReport'
 import { useReportsRealtime } from '../../hooks/useReportsRealtime'
 
 const SIDEBAR_KEY = 'citifix-admin-sidebar-collapsed'
 
-/**
- * Shared shell for every authenticated screen. Owns sidebar collapse
- * state — persisted so it survives reloads. Pages don't need any
- * special-casing since the layout is flex-based (main content
- * naturally gets the extra width when the sidebar shrinks). Note: the
- * old max-w-[1400px] cap on <main> was dropped here — wide tables like
- * Reports should use whatever width the sidebar state leaves them.
- */
-export default function AdminLayout({ crumb }) {
+function getPageTitle(pathname) {
+  if (pathname === '/') return 'Dashboard Overview'
+  if (pathname.startsWith('/reports/')) return 'Report Detail'
+  if (pathname === '/reports') return 'Reports'
+  if (pathname === '/departments') return 'Departments'
+  return 'Admin Portal'
+}
+
+export default function AdminLayout() {
+  const location = useLocation()
   const [collapsed, setCollapsed] = useState(() => {
     try {
       return localStorage.getItem(SIDEBAR_KEY) === 'true'
@@ -27,36 +26,44 @@ export default function AdminLayout({ crumb }) {
     }
   })
 
+  const [dismissedIds, setDismissedIds] = useState(() => new Set())
+
   function toggleCollapsed() {
     setCollapsed((prev) => {
       const next = !prev
       try {
         localStorage.setItem(SIDEBAR_KEY, String(next))
       } catch {
-        // localStorage unavailable (private browsing etc.) — not critical
+        // localStorage unavailable — not critical
       }
       return next
     })
   }
 
+  function dismissAlert(id) {
+    setDismissedIds((prev) => new Set(prev).add(id))
+  }
+
   useReportsRealtime()
   const { data: criticalAlerts = [] } = useCriticalAlerts()
-  const acknowledge = useAcknowledgeReport()
+  const visibleAlerts = criticalAlerts.filter((r) => !dismissedIds.has(r.id))
 
   return (
     <div className="flex min-h-screen bg-[var(--color-page)]">
-      <Sidebar collapsed={collapsed} onToggle={toggleCollapsed} />
+      <Sidebar collapsed={collapsed} />
       <div className="flex-1 flex flex-col min-w-0">
-        <Topbar crumb={crumb} notifications={criticalAlerts} />
+        <Topbar
+          pageTitle={getPageTitle(location.pathname)}
+          collapsed={collapsed}
+          onToggleSidebar={toggleCollapsed}
+          notifications={criticalAlerts}
+        />
         <main className="flex-1 p-6 w-full">
           <Outlet />
         </main>
       </div>
 
-      <CriticalAcknowledgmentModal
-        reports={criticalAlerts}
-        onAcknowledge={(id) => acknowledge.mutate(id)}
-      />
+      <CriticalAcknowledgmentModal reports={visibleAlerts} onDismiss={dismissAlert} />
     </div>
   )
 }
