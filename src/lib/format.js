@@ -1,3 +1,4 @@
+// src/lib/format.js — replace entirely
 export function formatRelativeTime(isoString) {
   if (!isoString) return '—'
   const date = new Date(isoString)
@@ -17,4 +18,16 @@ export function formatDuration(hours) {
   if (hours == null || Number.isNaN(hours)) return '—'
   if (hours < 24) return `${hours.toFixed(1)}h`
   return `${(hours / 24).toFixed(1)}d`
+}
+
+export function formatDateTime(isoString) {
+  if (!isoString) return '—'
+  const date = new Date(isoString)
+  return date.toLocaleString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
 }
